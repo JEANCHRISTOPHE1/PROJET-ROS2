@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROS2 Température & Humidité</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        .data-box { font-size: 24px; margin: 20px; padding: 20px; border: 1px solid #000; display: inline-block; }
+    </style>
+</head>
+<body>
+    <h1>Température & Humidité en Temps Réel</h1>
+    <div class="data-box">Température: <span id="temperature">--</span> °C</div>
+    <div class="data-box">Humidité: <span id="humidity">--</span> %</div>
+
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('temperature_update', function(data) {
+            document.getElementById('temperature').innerText = data.temperature;
+        });
+
+        socket.on('humidity_update', function(data) {
+            document.getElementById('humidity').innerText = data.humidity;
+        });
+    </script>
+</body>
+</html>
+
