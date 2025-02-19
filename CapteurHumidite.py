@@ -15,7 +15,7 @@ class HumiPublisher(Node):
 
     def timer_callback(self):
     	if self.i > 100:
-        	self.i = 100.0
+        	self.i = 10
     	else :
     		self.i += 0.5
     	msg = Float64()

@@ -13,14 +13,14 @@ class TempPublisher(Node):
         self.i = 20.0
 
     def timer_callback(self):
-    	if self.i >= 42.0:
-    		self.i = 42.0
+    	if self.i >= 42:
+    		self.i = 17
     	else :
     		self.i += 0.1
     	msg = Float64()
     	msg.data = self.i
     	self.publisher_.publish(msg)
-    	self.get_logger().info('Publishing: "%lf"' % msg.data)
+    	self.get_logger().info('Publishing: "%.2f"' % msg.data)
 
 
 def main(args=None):

@@ -1,16 +1,7 @@
-body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    padding: 20px;
+body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f4; 
 }
-
-.data-box {
-    font-size: 24px;
-    margin: 20px;
-    padding: 20px;
-    border: 2px solid #333;
-    display: inline-block;
-    background-color: #f8f9fa;
-    border-radius: 10px;
-}
-
+        .box { display: inline-block; padding: 20px; margin: 20px; border: 2px solid #333; border-radius: 10px; width: 200px; font-size: 20px; }
+        .temperature { background-color: #ffcccc; }
+        .humidite { background-color: #cceeff; }
+        button { padding: 10px 15px; font-size: 16px; margin-top: 20px; background-color: #007BFF; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #0056b3; }

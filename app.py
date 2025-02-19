@@ -1,59 +1,78 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64
-from flask import Flask, send_from_directory,send_file
-from flask_socketio import SocketIO
+from std_srvs.srv import Trigger
+from flask import Flask, send_file, jsonify, request
 import threading
 import os
 
-# Initialisation de Flask et WebSocket
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+temperature = None
+humidite = None
 
-class RosSubscriber(Node):
-    """ Noeud ROS2 qui souscrit aux topics température et humidité """
+class WebSubscriber(Node):
     def __init__(self):
-        super().__init__('ros_subscriber')
+        super().__init__('web_subscriber')
         self.create_subscription(Float64, 'temperature', self.temp_callback, 10)
         self.create_subscription(Float64, 'humidite', self.humi_callback, 10)
 
     def temp_callback(self, msg):
-        self.get_logger().info(f'Température reçue: {msg.data}')
-        socketio.emit('temperature_update', {'temperature': msg.data})  # Envoi WebSocket
+        global temperature
+        temperature = msg.data
+        self.get_logger().info(f'Température: {msg.data}')
 
     def humi_callback(self, msg):
-        self.get_logger().info(f'Humidité reçue: {msg.data}')
-        socketio.emit('humidity_update', {'humidity': msg.data})  # Envoi WebSocket
+        global humidite
+        humidite = msg.data
+        self.get_logger().info(f'Humidité: {msg.data}')
+
+
+class PortailClient(Node):
+    def __init__(self):
+        super().__init__('portail_client')
+        self.cli = self.create_client(Trigger, 'bouton')
+
+        while not self.cli.wait_for_service(timeout_sec=1.0):
+            self.get_logger().warn('Portail non disponible, attente...')
+
+    def send_request(self):
+        req = Trigger.Request()
+        future = self.cli.call_async(req)
+        future.add_done_callback(self.response_callback)
+
+    def response_callback(self, future):
+        try:
+            response = future.result()
+            print(f"Réponse ROS2 : {response.message}")
+        except Exception as e:
+            print(f"Erreur lors de la requête : {e}")
+
 
 @app.route('/')
 def index():
-    """ Sert le fichier HTML principal """
-    return send_file('index.html')
+    return send_file(os.path.join(os.getcwd(), 'index.html'))
 
-@app.route('/java.js')
-def javascript():
-    """ Sert le fichier JavaScript """
-    return send_from_directory(os.getcwd(), 'java.js')
+@app.route('/data', methods=['GET'])
+def get_data():
+    return jsonify({'temperature': temperature, 'humidite': humidite})
 
-@app.route('/style.css')
-def css():
-    """ Sert le fichier CSS """
-    return send_from_directory(os.getcwd(), 'style.css')
+@app.route('/portail', methods=['POST'])
+def bouton():
+    node = PortailClient()
+    node.send_request()
+    return jsonify({"message": "Commande envoyée au portail !"})
 
 def ros_spin():
-    """ Exécute le noeud ROS2 en parallèle """
     rclpy.init()
-    node = RosSubscriber()
+    node = WebSubscriber()
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
 
 def main():
-    """ Point d'entrée ROS2 """
-    global ros_thread
-    ros_thread = threading.Thread(target=ros_spin, daemon=True)
-    ros_thread.start()
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+    web_thread = threading.Thread(target=ros_spin, daemon=True)
+    web_thread.start()
+    app.run(host='0.0.0.0', port=5000, debug=True)
 
 if __name__ == '__main__':
     main()
