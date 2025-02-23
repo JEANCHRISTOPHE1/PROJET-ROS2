@@ -15,3 +15,5 @@ document.getElementById("portail-btn").addEventListener("click", function() {
                 .catch(error => console.error('Erreur:', error));
 });
 setInterval(updateValues, 1000);
+
+//TYRANNOSAURE
