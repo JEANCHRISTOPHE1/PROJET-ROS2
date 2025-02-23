@@ -14,7 +14,7 @@ class TempPublisher(Node):
 
     def timer_callback(self):
     	if self.i >= 42:
-    		self.i = 17
+    		self.i = 17.0
     	else :
     		self.i += 0.1
     	msg = Float64()

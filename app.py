@@ -2,11 +2,12 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64
 from std_srvs.srv import Trigger
-from flask import Flask, send_file, jsonify, request
+from flask import Flask, jsonify, request, send_file
 import threading
 import os
 
 app = Flask(__name__)
+
 temperature = None
 humidite = None
 
@@ -33,7 +34,7 @@ class PortailClient(Node):
         self.cli = self.create_client(Trigger, 'bouton')
 
         while not self.cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().warn('Portail non disponible, attente...')
+            self.get_logger().warn('Attente du Portail')
 
     def send_request(self):
         req = Trigger.Request()
@@ -51,6 +52,14 @@ class PortailClient(Node):
 @app.route('/')
 def index():
     return send_file(os.path.join(os.getcwd(), 'index.html'))
+
+@app.route('/style.css')
+def styles():
+    return send_file(os.path.join(os.getcwd(), 'style.css'))
+
+@app.route('/script.js')
+def script():
+    return send_file(os.path.join(os.getcwd(), 'script.js'))
 
 @app.route('/data', methods=['GET'])
 def get_data():

@@ -4,17 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ROS2 Dashboard</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f4f4; }
-        .box { display: inline-block; padding: 20px; margin: 20px; border: 2px solid #333; border-radius: 10px; width: 200px; font-size: 20px; }
-        .temperature { background-color: #ffcccc; }
-        .humidite { background-color: #cceeff; }
-        button { padding: 10px 15px; font-size: 16px; margin-top: 20px; background-color: #007BFF; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #0056b3; }
-    </style>
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-    <h1>Contrôle du Portail et Affichage des Valeurs</h1>
+    <h1>Contrôle du Portail et Capteurs</h1>
     
     <div class="box temperature">
         <h2>Température</h2>
@@ -28,27 +21,7 @@
 
     <br>
     <button id="portail-btn">Ouvrir/Fermer le Portail</button>
-
-    <script>
-        function updateValues() {
-            fetch('/data')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('temp').innerText = data.temperature !== null ? data.temperature + " °C" : "-- °C";
-                    document.getElementById('humi').innerText = data.humidite !== null ? data.humidite + " %" : "-- %";
-                })
-                .catch(error => console.error('Erreur:', error));
-        }
-
-        document.getElementById("portail-btn").addEventListener("click", function() {
-            fetch('/portail', { method: "POST" })
-                .then(response => response.json())
-                .then(data => alert(data.message))
-                .catch(error => console.error('Erreur:', error));
-        });
-
-        setInterval(updateValues, 1000);
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
 
