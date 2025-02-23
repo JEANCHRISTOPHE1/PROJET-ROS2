@@ -14,7 +14,7 @@ class BoutonClient(Node):
         self.cli = self.create_client(Trigger, 'bouton')
         
         while not self.cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().warn('Portail non disponible, attente...')
+            self.get_logger().warn('Attente du Portail')
         
         self.bouton_state = False
 
@@ -31,9 +31,6 @@ class BoutonClient(Node):
             self.get_logger().error(f"Échec de la requête : {str(e)}")
     
     def keyboard_listener(self):
-        # Écoute le clavier pour détecter la touche Espace
-        self.get_logger().info("Appuyez sur ESPACE pour simuler le bouton (CTRL+C pour quitter)")
-        
         while rclpy.ok():
             key = self.get_key()
             if key == " ":
@@ -42,7 +39,6 @@ class BoutonClient(Node):
                 self.send_request()
     
     def get_key(self):
-        # Récupère une touche du clavier sans bloquer le terminal
         fd = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fd)
         try:
